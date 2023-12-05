@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+	<flow name="fetch-train-detailsFlow" doc:id="73f442d1-7776-4619-8967-b486fdd2fcc9">
+		<flow-ref doc:name="fetch-train-details-req-subFlow" doc:id="66c6d839-6e01-42eb-b2bb-7d170ce7caf9" name="fetch-train-details-req-subFlow" target="detailsFetchResponse"/>
+		
+		<flow-ref doc:name="verify-existence-subFlow" doc:id="cac3ae6b-f5cf-4ca7-b93e-edaee3fca5ff" name="verify-existence-subFlow"/>
+		<ee:transform doc:name="Success Response" doc:id="d4c3ca29-bed6-4610-9389-4b75b9dae00e">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+(vars.detailsFetchResponse.docs map{
+  trainId: $.trainId,
+  trainName: $.trainName,
+  sourceStation: $.sourceStation,
+  destinationStation: $.destinationStation,
+  startTime: $.startTime,
+  endTime: $.endTime,
+  classTypes: $.classTypes
+})[0]]]></ee:set-payload>
+            </ee:message>
+			<ee:variables>
+			</ee:variables>
+        
+</ee:transform>
+	
+	
+</flow>
+	<sub-flow name="fetch-train-details-req-subFlow" doc:id="c6ed86eb-4308-49a1-86f3-c4d48bd5fb7a" >
+		<ee:transform doc:name="Cloudant Query" doc:id="19435adb-4b9d-43e0-b5bf-004a28462c0c">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+    "fields": [
+        "_id",
+        "_rev",
+        "trainId",
+        "trainName",
+        "sourceStation",
+        "destinationStation",
+        "startTime",
+        "endTime",
+        "classTypes"
+    ],
+    "selector": {
+        "trainId": {
+            "\$eq": vars.trainId
+        }
+    }
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<until-successful maxRetries="3" doc:name="Until Successful" doc:id="116927ac-f486-4e05-abe7-7823ab805670" millisBetweenRetries="30000">
+			<http:request method="POST" doc:name="Fetch Train Details" doc:id="7ed0eda6-e14f-4d80-a900-9e20e0a85951" config-ref="IBM_CloudantDB_API_Request_configuration" path="/_find" />
+		</until-successful>
+	</sub-flow>
+</mule>

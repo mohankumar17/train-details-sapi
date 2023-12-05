@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+	<flow name="upsert-train-detailsFlow" doc:id="b33074c6-b946-4ef4-b11d-e71113349a1c">
+	<set-variable value="#[payload.trainId]" doc:name="trainId" doc:id="411424c8-af92-42ad-9421-9fdcf46427a9" variableName="trainId"/>
+		<flow-ref doc:name="fetch-train-details-req-subFlow" doc:id="d2c0866b-f7b8-45ca-b8be-5f44e8fa66b7" name="fetch-train-details-req-subFlow" target="detailsFetchResponse"/>
+		<ee:transform doc:name="Prepare Request Body" doc:id="df9502ad-6294-4a1d-9a30-a24a39c55ec5">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+if (sizeOf(vars.detailsFetchResponse.docs) > 0) 
+	((vars.detailsFetchResponse.docs[0] filterObject (($$ ~= "_id") or ($$ ~= "_rev"))) ++ payload)
+else payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<until-successful maxRetries="5" doc:name="Until Successful" doc:id="a1c7bb43-013e-4d9a-8ff1-f2b7af2d3a6c" >
+			<http:request method="POST" doc:name="Upsert Train Details" doc:id="ffaebffd-3108-4cca-a659-64b1a752d07f" config-ref="IBM_CloudantDB_API_Request_configuration" path="/" />
+		</until-successful>
+		<ee:transform doc:name="Success Response">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+  message: "Train details " ++ 
+  	(if (sizeOf(vars.detailsFetchResponse.docs) == 0) "inserted" else "updated")
+  	++ " successfully",
+  trainId: vars.trainId,
+  dateTime: now() as String{format:"yyyy-MM-dd'T'hh:mm:ss'Z'"}
+}]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+	</flow>
+</mule>

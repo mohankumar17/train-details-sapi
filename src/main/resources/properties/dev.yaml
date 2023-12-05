@@ -1,0 +1,7 @@
+ibm:
+  cloudantDB:
+    host: "67e4a695-2f93-4ee1-9247-456f81ebabf5-bluemix.cloudantnosqldb.appdomain.cloud"
+    basePath: "/train-details"
+    username: "![x390KgG90VK8ShTmw7S7cGxLaDz1T85SJqrGv5WwJhJdYI9bl9FWAnL0UHuO86zxNdanMsoNJgHjvw6UTdHApA==]"
+    password: "![DB9fwzu2x39s/+u/nqNc1/6bnZTmcgMDoUVDA9FdsegzWexR6eYMOkcgVj/rfaN8]"
+  

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+	<flow name="delete-train-detailsFlow" doc:id="a61a1680-0b45-4e2c-996d-8d142ba85a16">
+		<flow-ref doc:name="fetch-train-details-req-subFlow" doc:id="a6a885bc-f484-4f29-86e5-0bd50c270079" name="fetch-train-details-req-subFlow" target="detailsFetchResponse"/>
+		<flow-ref doc:name="verify-existence-subFlow" doc:id="4b972d45-5a08-430d-b1e3-e23234ff181d" name="verify-existence-subFlow"/>
+		<until-successful maxRetries="5" doc:name="Until Successful" doc:id="96241f4e-ada0-4e4d-ad57-c96d6b1efed4" >
+			<http:request method="DELETE" doc:name="Delete Train Details" doc:id="2f677aaf-be18-4891-85f0-e20453844488" config-ref="IBM_CloudantDB_API_Request_configuration" path="/{docId}">
+				<http:uri-params ><![CDATA[#[{
+	docId: vars.detailsFetchResponse.docs[0]."_id"
+}]]]></http:uri-params>
+				<http:query-params ><![CDATA[#[{
+	rev: vars.detailsFetchResponse.docs[0]."_rev"
+}]]]></http:query-params>
+			</http:request>
+		</until-successful>
+		<ee:transform doc:name="Success Response">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+  message: "Train details deleted successfully",
+  trainId: vars.trainId,
+  dateTime: now() as String{format:"yyyy-MM-dd'T'hh:mm:ss'Z'"}
+}]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+	
+	</flow>
+</mule>

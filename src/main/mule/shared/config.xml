@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:api-gateway="http://www.mulesoft.org/schema/mule/api-gateway"
+	xmlns:os="http://www.mulesoft.org/schema/mule/os"
+	xmlns:secure-properties="http://www.mulesoft.org/schema/mule/secure-properties" xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd 
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/secure-properties http://www.mulesoft.org/schema/mule/secure-properties/current/mule-secure-properties.xsd
+http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/current/mule-os.xsd
+http://www.mulesoft.org/schema/mule/api-gateway http://www.mulesoft.org/schema/mule/api-gateway/current/mule-api-gateway.xsd">
+	
+	<http:listener-config name="train-details-sapi-httpListenerConfig">
+        <http:listener-connection host="0.0.0.0" port="${http.port}" />
+    </http:listener-config>
+    <apikit:config name="train-details-sapi-config" api="resource::b98b97ab-1755-496f-aa80-cf17a9e56db8:train-details-sapi:1.0.0:raml:zip:train-details-sapi.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" />
+    <configuration-properties doc:name="Configuration properties" doc:id="40e1f217-5bff-4df4-b150-d00299dd01b9" file="properties\default.yaml" />
+	<http:request-config name="IBM_CloudantDB_API_Request_configuration" doc:name="HTTP Request configuration" doc:id="327ef159-8504-42f8-8e5d-11a38f1f7894" basePath="${secure::ibm.cloudantDB.basePath}" >
+		<http:request-connection protocol="HTTPS" host="${secure::ibm.cloudantDB.host}" >
+			<reconnection >
+				<reconnect frequency="5000" count="3"/>
+			</reconnection>
+			<http:authentication >
+				<http:basic-authentication username="${secure::ibm.cloudantDB.username}" password="${secure::ibm.cloudantDB.password}" />
+			</http:authentication>
+		
+</http:request-connection>
+	</http:request-config>
+	<secure-properties:config name="Secure_Properties_Config" doc:name="Secure Properties Config" doc:id="ad5b048e-4e67-4a2f-8d9d-4fb6d9fffb1b" file="properties/${mule.env}.yaml" key="${enc.key}" />
+	<api-gateway:autodiscovery apiId="19155372" ignoreBasePath="true" doc:name="API Autodiscovery" doc:id="7c8c17bb-230d-4874-9441-882acd550516" flowRef="train-details-sapi-main" />
+	
+
+</mule>

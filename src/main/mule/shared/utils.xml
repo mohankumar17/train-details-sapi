@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+	<sub-flow name="verify-existence-subFlow" doc:id="8c50b2e2-a26c-42ce-ac8b-a1aea025d460">
+	<choice doc:name="Choice" doc:id="497975d7-c1b6-4187-a4ca-4c882d1ad72d" >
+			<when expression="#[sizeOf(vars.detailsFetchResponse.docs) == 0]">
+				<raise-error doc:name="Raise error" doc:id="bee8dbd8-66d9-4502-932f-459f528aac0e" type="TRAIN_ID:NOT_FOUND" description='#["Train details with ID: " ++ vars.trainId ++ " not found in the system"]'/>
+			</when>
+		</choice>
+	</sub-flow>
+</mule>

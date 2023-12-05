@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+	<flow name="application-healthcheckFlow" doc:id="2682a9c3-1cd2-43d4-9bb7-6e9e43d72ae2" >
+		<http:listener doc:name="/api/health" doc:id="8bd5225a-edfc-4eb6-838f-126651d4aa4a" config-ref="train-details-sapi-httpListenerConfig" path="/api/health"/>
+		<set-payload value='#["Application is up and running."]' doc:name="Set Payload" doc:id="62c25497-919d-45f7-9889-23d854cf1940" />
+	</flow>
+</mule>

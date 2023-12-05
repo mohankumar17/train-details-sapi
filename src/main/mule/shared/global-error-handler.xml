@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+	<sub-flow name="global-error-handler-response-subflow" doc:id="8b3fa8f3-0d09-4aab-9159-cd2c35ad885d" >
+		<ee:transform doc:name="Error Response" doc:id="e1572a7c-03bd-494a-832e-a3186233dc64" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+  "message": vars.errorDetails.message,
+  "description": vars.errorDetails.description,
+  "dateTime": now() as String{format: "yyyy-MM-dd'T'hh:mm:ss'Z'"},
+  "transactionId": vars.transactionId
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="ERROR" doc:name="Logger" doc:id="bd28753d-abd6-458c-8332-78634e7a823b" message="#[payload]"/>
+	</sub-flow>
+	<error-handler name="global-error-handler" doc:id="d16edc56-ad47-4ad9-896c-759e64ccfb88">
+		<on-error-propagate type="APIKIT:BAD_REQUEST">
+                <ee:transform doc:name="errorDetails">
+                    <ee:message>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus"><![CDATA[400]]></ee:set-variable>
+					<ee:set-variable variableName="errorDetails" ><![CDATA[%dw 2.0
+output application/json
+---
+{
+  "message": "Bad request to train details API",
+  "description": error.description
+}]]></ee:set-variable>
+                    
+</ee:variables>
+                </ee:transform>
+			<flow-ref doc:name="global-error-handler-response-subflow" doc:id="91784c80-3411-4c5a-88bc-6cdd5faa1788" name="global-error-handler-response-subflow"/>
+            
+</on-error-propagate>
+            <on-error-propagate type="APIKIT:NOT_FOUND,TRAIN_ID:NOT_FOUND" enableNotifications="true" logException="true">
+			<ee:transform doc:name="errorDetails" doc:id="b9b369a9-3fa6-4620-bd31-55803cf972c4">
+				<ee:message />
+				<ee:variables>
+					<ee:set-variable variableName="errorDetails"><![CDATA[%dw 2.0
+output application/json
+---
+{
+  "message": "Train details not found",
+  "description": error.description
+}]]></ee:set-variable>
+					<ee:set-variable variableName="httpStatus"><![CDATA[404]]></ee:set-variable>
+				</ee:variables>
+			</ee:transform>
+			<flow-ref doc:name="global-error-handler-response-subflow" doc:id="6e959aa8-d4c7-4c07-9f1f-405dd7e190da" name="global-error-handler-response-subflow"/>
+
+            </on-error-propagate>
+            <on-error-propagate type="APIKIT:METHOD_NOT_ALLOWED">
+			<ee:transform doc:name="errorDetails" doc:id="3855f88a-6c93-494d-baaf-ea1762e98c80">
+				<ee:message />
+				<ee:variables>
+					<ee:set-variable variableName="errorDetails"><![CDATA[%dw 2.0
+output application/json
+---
+{
+  "message": "Request method not allowed",
+  "description": error.description
+}]]></ee:set-variable>
+					<ee:set-variable variableName="httpStatus"><![CDATA[405]]></ee:set-variable>
+				</ee:variables>
+			</ee:transform>
+			<flow-ref doc:name="global-error-handler-response-subflow" doc:id="177438e5-21ec-4512-8ab5-15b79977112a" name="global-error-handler-response-subflow" />
+            
+</on-error-propagate>
+            <on-error-propagate type="APIKIT:UNSUPPORTED_MEDIA_TYPE">
+			<ee:transform doc:name="errorDetails" doc:id="d22ba96f-86dd-419f-8cf5-7bdb5f2f70ba">
+				<ee:message />
+				<ee:variables>
+					<ee:set-variable variableName="errorDetails"><![CDATA[%dw 2.0
+output application/json
+---
+{
+  "message": "Media Type is unsupported. Train details API accepts only JSON Media Type.",
+  "description": error.description
+}]]></ee:set-variable>
+					<ee:set-variable variableName="httpStatus"><![CDATA[415]]></ee:set-variable>
+				</ee:variables>
+			</ee:transform>
+			<flow-ref doc:name="global-error-handler-response-subflow" doc:id="fb6aced2-5520-4588-a911-5703f0a8a922" name="global-error-handler-response-subflow" />
+            
+</on-error-propagate>
+			
+
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="3a64fed8-55c2-4d36-8bec-d24c0b8d3483" type="HTTP:CONNECTIVITY, HTTP:INTERNAL_SERVER_ERROR, HTTP:RETRY_EXHAUSTED, HTTP:SERVICE_UNAVAILABLE, HTTP:TIMEOUT">
+				<ee:transform doc:name="errorDetails" doc:id="f796dc1c-e20d-4380-8528-640cb349be5d">
+					<ee:message>
+					</ee:message>
+					<ee:variables>
+						<ee:set-variable variableName="errorDetails"><![CDATA[%dw 2.0
+output application/json
+---
+{
+  "message": "Upstream services are unable to fulfill the request",
+  "description": error.description
+}]]></ee:set-variable>
+						<ee:set-variable variableName="httpStatus"><![CDATA[503]]></ee:set-variable>
+					</ee:variables>
+				</ee:transform>
+				<flow-ref doc:name="global-error-handler-response-subflow" doc:id="dd37278d-2a1c-4782-b175-ffa926194de2" name="global-error-handler-response-subflow" />
+			</on-error-propagate>
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="facd9481-80bf-4bf2-a5d6-b7043f8e74d6" type="ANY">
+			<ee:transform doc:name="errorDetails" doc:id="b046ba6e-2ead-4ddf-b2c6-0e2b4dc43dbf">
+				<ee:message />
+				<ee:variables>
+					<ee:set-variable variableName="errorDetails"><![CDATA[%dw 2.0
+output application/json
+---
+{
+  "message": "Train details application error",
+  "description": error.description
+}]]></ee:set-variable>
+					<ee:set-variable variableName="httpStatus"><![CDATA[500]]></ee:set-variable>
+				</ee:variables>
+			</ee:transform>
+			<flow-ref doc:name="global-error-handler-response-subflow" doc:id="afd81494-bbc3-4461-9a6e-95afac916379" name="global-error-handler-response-subflow" />
+		</on-error-propagate>
+	
+	
+</error-handler>
+
+
+
+</mule>
