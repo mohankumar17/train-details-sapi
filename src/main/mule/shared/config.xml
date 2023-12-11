@@ -14,7 +14,7 @@ http://www.mulesoft.org/schema/mule/api-gateway http://www.mulesoft.org/schema/m
 	<http:listener-config name="train-details-sapi-httpListenerConfig">
         <http:listener-connection host="0.0.0.0" port="${http.port}" />
     </http:listener-config>
-    <apikit:config name="train-details-sapi-config" api="resource::b98b97ab-1755-496f-aa80-cf17a9e56db8:train-details-sapi:1.0.0:raml:zip:train-details-sapi.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" />
+    <apikit:config name="train-details-sapi-config" api="resource::c01f82a6-7df0-4b05-860e-12711fd918eb:train-details-sapi:1.0.0:raml:zip:train-details-sapi.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" />
     <configuration-properties doc:name="Configuration properties" doc:id="40e1f217-5bff-4df4-b150-d00299dd01b9" file="properties\default.yaml" />
 	<http:request-config name="IBM_CloudantDB_API_Request_configuration" doc:name="HTTP Request configuration" doc:id="327ef159-8504-42f8-8e5d-11a38f1f7894" basePath="${secure::ibm.cloudantDB.basePath}" >
 		<http:request-connection protocol="HTTPS" host="${secure::ibm.cloudantDB.host}" >
@@ -28,7 +28,7 @@ http://www.mulesoft.org/schema/mule/api-gateway http://www.mulesoft.org/schema/m
 </http:request-connection>
 	</http:request-config>
 	<secure-properties:config name="Secure_Properties_Config" doc:name="Secure Properties Config" doc:id="ad5b048e-4e67-4a2f-8d9d-4fb6d9fffb1b" file="properties/${mule.env}.yaml" key="${enc.key}" />
-	<api-gateway:autodiscovery apiId="19155372" ignoreBasePath="true" doc:name="API Autodiscovery" doc:id="7c8c17bb-230d-4874-9441-882acd550516" flowRef="train-details-sapi-main" />
+	<api-gateway:autodiscovery apiId="19168314" ignoreBasePath="true" doc:name="API Autodiscovery" doc:id="7c8c17bb-230d-4874-9441-882acd550516" flowRef="train-details-sapi-main" />
 	
 
 </mule>
