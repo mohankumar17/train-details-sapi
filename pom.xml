@@ -49,7 +49,7 @@
 		<dependency>
 			<groupId>c01f82a6-7df0-4b05-860e-12711fd918eb</groupId>
 			<artifactId>train-details-sapi</artifactId>
-			<version>1.0.0</version>
+			<version>1.0.1</version>
 			<classifier>raml</classifier>
 			<type>zip</type>
 		</dependency>

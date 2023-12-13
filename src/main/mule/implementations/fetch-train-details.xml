@@ -15,15 +15,7 @@ http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/htt
                 <ee:set-payload><![CDATA[%dw 2.0
 output application/json
 ---
-(vars.detailsFetchResponse.docs map{
-  trainId: $.trainId,
-  trainName: $.trainName,
-  sourceStation: $.sourceStation,
-  destinationStation: $.destinationStation,
-  startTime: $.startTime,
-  endTime: $.endTime,
-  classTypes: $.classTypes
-})[0]]]></ee:set-payload>
+((vars.detailsFetchResponse.docs)[0] as Object) - "_id" - "_rev"]]></ee:set-payload>
             </ee:message>
 			<ee:variables>
 			</ee:variables>
@@ -44,11 +36,8 @@ output application/json
         "_rev",
         "trainId",
         "trainName",
-        "sourceStation",
-        "destinationStation",
-        "startTime",
-        "endTime",
-        "classTypes"
+        "seatClasses",
+        "haltStations"
     ],
     "selector": {
         "trainId": {

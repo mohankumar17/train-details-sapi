@@ -14,7 +14,7 @@ http://www.mulesoft.org/schema/mule/api-gateway http://www.mulesoft.org/schema/m
 	<http:listener-config name="train-details-sapi-httpListenerConfig">
         <http:listener-connection host="0.0.0.0" port="${http.port}" />
     </http:listener-config>
-    <apikit:config name="train-details-sapi-config" api="resource::c01f82a6-7df0-4b05-860e-12711fd918eb:train-details-sapi:1.0.0:raml:zip:train-details-sapi.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" />
+    <apikit:config name="train-details-sapi-config" api="resource::c01f82a6-7df0-4b05-860e-12711fd918eb:train-details-sapi:1.0.1:raml:zip:train-details-sapi.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" />
     <configuration-properties doc:name="Configuration properties" doc:id="40e1f217-5bff-4df4-b150-d00299dd01b9" file="properties\default.yaml" />
 	<http:request-config name="IBM_CloudantDB_API_Request_configuration" doc:name="HTTP Request configuration" doc:id="327ef159-8504-42f8-8e5d-11a38f1f7894" basePath="${secure::ibm.cloudantDB.basePath}" >
 		<http:request-connection protocol="HTTPS" host="${secure::ibm.cloudantDB.host}" >
